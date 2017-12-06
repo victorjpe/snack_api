@@ -13,4 +13,4 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/api', router);
 
-app.listen(port, () => console.log('Snack Api is Up and Running'));
+app.listen(port, () => console.log('App up and running'));

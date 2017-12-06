@@ -22,10 +22,11 @@ module.exports = {
     });
   },
 
+  //Users
   getUsers: (cb) => {
     doc.getRows(1, {
-      offset: 1
-    }, function (err, cells) {
+      offset: 1,
+    }, (err, cells) => {
       let users = [];
       cells.forEach(user => {
         users.push({ name: user.name, firstName: user.first_name, lastName: user.last_name });
@@ -35,20 +36,18 @@ module.exports = {
   },
   validateUser: (cb, userName, pwd) => {
     doc.getRows(1, {
-      offset: 1
-    }, function (err, cells) {
+      query: 'name===' + userName
+    }, (err, rows) => {
       let user;
-      cells.forEach(user => {
-        if (user.name === userName && element.pwd === pwd) {
-          user = { name: user.name, firstName: user.firstName, lastName: user.lastName }
-        }
-      });
+      if (rows) {
+        user = { name: user.name, firstName: user.firstName, lastName: user.lastName };
+      }
       cb(user);
     });
   },
   addUser: (cb, user) => {
     doc.addRow(1, user, (err, res) => {
-      if(err){
+      if (err) {
         cb(err);
       }
       cb(res);
@@ -56,23 +55,47 @@ module.exports = {
   },
   deleteUser: (cb, name) => {
     doc.getRows(1, {
-      query: 'name==name'
+      query: 'name==' + name
     }, (err, row) => {
-      row.del(() => {
-        cb('User removed success');
-      })
+      if (row.length > 0) {
+        row[0].del(() => {
+          cb('User removed success');
+        })
+      }
     });
   },
+
+  //Items
   getItems: (cb) => {
     doc.getRows(2, {
       offset: 1
-    }, function (err, cells) {
+    }, (err, cells) => {
       let items = [];
       cells.forEach(item => {
         items.push({ name: item.name, url: item.url, description: item.description });
       });
       cb(items);
     });
-  }
+  },
+  addItem: (cb, item) => {
+    doc.addRow(2, item, (err, res) => {
+      if (err) {
+        cb(err);
+      }
+      cb(res);
+    });
+  },
 
+  //Orders
+  getOrders: (cb) => {
+    doc.getRows(3, {
+      offset: 1,
+      query: 'date=='+ new Date()
+    }, (err, res) => {
+
+    });
+  },
+  addOrder: (cb, order) => {
+    doc.addRow()
+  }
 };
