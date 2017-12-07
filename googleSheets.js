@@ -1,7 +1,6 @@
 const GoogleSpreadsheet = require('google-spreadsheet');
 const async = require('async');
 const creds = require('./secret.json');
-const moment = require('moment');
 
 // spreadsheet key is the long id in the sheets URL 
 const doc = new GoogleSpreadsheet('1i0V39YqQGsw8977NHII2d4gr1flz650F6_bXU-1dq28');
@@ -73,7 +72,7 @@ module.exports = {
     }, (err, cells) => {
       let items = [];
       cells.forEach(item => {
-        items.push({ id: item.id, name: item.name, url: item.url, description: item.description });
+        items.push({ id: item.id, name: item.name, url: item.url, description: item.description, price: item.price });
       });
       cb(items);
     });
@@ -89,20 +88,36 @@ module.exports = {
 
   //Orders
   getOrders: (cb) => {
-    var date = moment().format();
-    doc.getRows(3, {
-      offset: 1,
-      query: 'date==='+ date
+    doc.getRows(4, {
+      offset: 1
     }, (err, results) => {
       cb(results)
     });
   },
   addOrder: (cb, order) => {
-    doc.addRow(3, order, (err, res) => {
+    doc.addRow(4, order, (err, res) => {
       if (err) {
         cb(err);
       }
       cb(res);
     });
+  },
+
+  //Balances
+  calculateBalanceAndUpdate: (cb) => {
+    
+    async.wa
+    async.series(
+      (next) => {
+        doc.getRows(4, {
+          offset: 1
+        }, (err, results) => {
+          cb(results)
+        });
+      },
+      (err, res) => {
+        console.log(err);
+      }
+    );
   }
 };
