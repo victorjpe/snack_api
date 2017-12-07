@@ -49,10 +49,14 @@ router
 // Define the order route
 router
   .get('/orders', (req, res) => {
-
+    googleSheet.getOrders((result) => {
+      res.send(result);
+    });
   })
   .post('/orders/add', (req, res) => {
-
+    googleSheet.addOrder((result) => {
+      res.send(result);
+    }, req.body);
   });
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const GoogleSpreadsheet = require('google-spreadsheet');
 const async = require('async');
 const creds = require('./secret.json');
+const moment = require('moment');
 
 // spreadsheet key is the long id in the sheets URL 
 const doc = new GoogleSpreadsheet('1i0V39YqQGsw8977NHII2d4gr1flz650F6_bXU-1dq28');
@@ -29,7 +30,7 @@ module.exports = {
     }, (err, cells) => {
       let users = [];
       cells.forEach(user => {
-        users.push({ name: user.name, firstName: user.first_name, lastName: user.last_name });
+        users.push({ id: user.id, name: user.name, firstName: user.first_name, lastName: user.last_name });
       });
       return cb(users);
     });
@@ -40,7 +41,7 @@ module.exports = {
     }, (err, rows) => {
       let user;
       if (rows) {
-        user = { name: user.name, firstName: user.firstName, lastName: user.lastName };
+        user = { id: rows[0].id, name: rows[0].name, firstName: rows[0].firstName, lastName: rows[0].lastName };
       }
       cb(user);
     });
@@ -72,7 +73,7 @@ module.exports = {
     }, (err, cells) => {
       let items = [];
       cells.forEach(item => {
-        items.push({ name: item.name, url: item.url, description: item.description });
+        items.push({ id: item.id, name: item.name, url: item.url, description: item.description });
       });
       cb(items);
     });
@@ -88,14 +89,20 @@ module.exports = {
 
   //Orders
   getOrders: (cb) => {
+    var date = moment().format();
     doc.getRows(3, {
       offset: 1,
-      query: 'date=='+ new Date()
-    }, (err, res) => {
-
+      query: 'date==='+ date
+    }, (err, results) => {
+      cb(results)
     });
   },
   addOrder: (cb, order) => {
-    doc.addRow()
+    doc.addRow(3, order, (err, res) => {
+      if (err) {
+        cb(err);
+      }
+      cb(res);
+    });
   }
 };
